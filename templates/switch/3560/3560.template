@@ -1,0 +1,76 @@
+conf t
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname $HOSTNAME
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no username Cisco
+username $USER privilege $PRIVILEGE secret $SECRET_OPTION $SECRET
+!
+no aaa new-model
+system mtu routing 1500
+vtp mode transparent
+ip subnet-zero
+ip domain-name $DOMAIN_NAME
+no ip name-server
+ip name-server $NAME_SERVER1
+ip name-server $NAME_SERVER2
+!
+spanning-tree mode pvst
+spanning-tree loopguard default
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+vlan $VLAN_NUMBER
+ name $VLAN_NAME
+!
+ip ssh time-out 60
+ip ssh authentication-retries 2
+!
+!
+interface $INTERFACE
+  $INTERFACE_COMMANDS
+!
+interface $VLAN_INTERFACE
+ ip address $VLAN_IP $VLAN_NETMASK
+ no ip route-cache
+ no ip mroute-cache
+ $SHUT_NOSHUT
+!
+ip default-gateway $DEFAULT_GATEWAY
+ip classless
+no ip http server
+no ip http secure-server
+!
+!
+logging history informational
+logging facility local6
+logging $LOGGING_SERVER
+!
+snmp-server community $SNMP_COMMUNITY_STRING RO
+!
+control-plane
+!
+ntp server $NTP_SERVER1
+ntp server $NTP_SERVER2
+!
+crypto key gen rsa gen mod $MODULUS
+!
+line con 0
+line vty 0 4
+ login local
+ transport preferred ssh
+ transport input ssh
+line vty 5 15
+ login local
+ transport preferred ssh
+ transport input ssh
+!
+end
